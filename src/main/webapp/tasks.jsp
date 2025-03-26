@@ -10,9 +10,18 @@ List<TaskEntity> tasks = (List<TaskEntity>) request.getAttribute("tasks");
 <body>
     <h1>Список задач</h1>
     <div><a href="/new-task.jsp">Создать задачу</a></div>
+    <% if (tasks.isEmpty()) { %>
+        <div>Пока нет задач</div>
+    <% } %>
     <div>
         <% for (int i = 0; i < tasks.size(); i++ ) { %>
-            <div><%= tasks.get(i).name %></div>
+            <% TaskEntity task = tasks.get(i); %>
+            <div>
+                <div><%= task.name %> - <%= task.status %></div>
+                <div><%= task.description %></div>
+                <a href="/tasks/<%= task.id %>">Открыть задачу</a>
+            </div>
+            <br>
         <% } %>
     </div>
 </body>

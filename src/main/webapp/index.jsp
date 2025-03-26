@@ -5,7 +5,7 @@
 </head>
 <body>
     <h1>Добро пожаловать в Менеджер Задач</h1>
-    <div><a href="/tasks.jsp">Все задачи</a></div>
+    <div><a href="/tasks">Все задачи</a></div>
     <div><a href="/new-task.jsp">Создать задачу</a></div>
 </body>
 </html>

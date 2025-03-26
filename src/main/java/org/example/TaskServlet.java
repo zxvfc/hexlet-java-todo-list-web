@@ -11,29 +11,50 @@ import java.util.List;
 
 public class TaskServlet extends HttpServlet {
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        System.out.println("GET REQUEST!!!");
+    Storage storage;
 
-        List<TaskEntity> tasks = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
-            TaskEntity task = new TaskEntity();
-            task.name = "Task name-" + i;
-            task.description = "Task desc-" + i;
-            task.status = "Pending";
-            tasks.add(task);
+    TaskServlet(Storage storage) {
+        this.storage = storage;
+    }
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String pathInfo = request.getPathInfo();
+
+        System.out.println(pathInfo);
+        if (pathInfo == null || pathInfo.equals("/")) {
+            List<TaskEntity> tasks = storage.getAll();
+            request.setAttribute("tasks", tasks);
+            request.getRequestDispatcher("/tasks.jsp").forward(request, response);
+        } else {
+            int id = Integer.parseInt(pathInfo.substring(1));
+            TaskEntity task = storage.getById(id);
+            if (task == null) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Задача с таким id не найдена");
+                return;
+            }
+            request.setAttribute("task", task);
+            request.getRequestDispatcher("/task.jsp").forward(request, response);
         }
-        request.setAttribute("tasks", tasks);
-        request.getRequestDispatcher("/tasks.jsp").forward(request, response);
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String taskName = request.getParameter("name");
-        String taskDescription = request.getParameter("description");
-        String taskStatus = request.getParameter("status");
+        String pathInfo = request.getPathInfo();
 
-        System.out.println("Name: " + taskName);
-        System.out.println("Desc: " + taskDescription);
-        System.out.println("Status: " + taskStatus);
+        if (pathInfo == null) {
+            TaskEntity task = new TaskEntity();
+            task.name = request.getParameter("name");
+            task.description = request.getParameter("description");
+            task.status = request.getParameter("status");
+            storage.save(task);
+        } else {
+            String[] path = pathInfo.split("/");
+            String action = path[path.length - 1];
+            if (action.equalsIgnoreCase("delete")) {
+                int id = Integer.parseInt(path[1]);
+                storage.delete(id);
+            }
+        }
+
         response.sendRedirect("/tasks");
     }
 
