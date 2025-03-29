@@ -39,6 +39,7 @@ public class TaskServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String pathInfo = request.getPathInfo();
+        request.setCharacterEncoding("UTF-8");
 
         if (pathInfo == null) {
             TaskEntity task = new TaskEntity();
@@ -46,6 +47,7 @@ public class TaskServlet extends HttpServlet {
             task.description = request.getParameter("description");
             task.status = request.getParameter("status");
             storage.save(task);
+            System.out.println(task.name);
         } else {
             String[] path = pathInfo.split("/");
             String action = path[path.length - 1];
